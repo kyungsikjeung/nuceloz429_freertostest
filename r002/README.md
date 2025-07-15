@@ -1,12 +1,12 @@
 # FreeRTOS 튜토리얼 #2 - 태스크(Task) 기본 개념 및 활용 (CMSIS-OS v1)
 
-이 문서는 FreeRTOS의 핵심 개념 중 하나인 '태스크(Task)'에 대해 초보자도 쉽게 이해할 수 있도록 설명합니다. 태스크의 생성, 실행 전환, 잠시 멈춤(일시 중지), 다시 시작(재개), 그리고 완전히 끝내는(종료) 방법까지, STM32CubeIDE 설정과 함께 실제 코드 예시를 통해 자세히 알아봅니다.
+이 문서는 Task 생성, 실행 전환, 잠시 멈춤(일시 중지), 다시 시작(재개), 그리고 완전히 끝내는(종료) 확인하기 위함
 
 ## 1. 프로젝트 개요: FreeRTOS 태스크 마스터하기
 
-이 튜토리얼은 STM32 마이크로컨트롤러에서 FreeRTOS의 태스크 관련 기능을 직접 실습해보는 것을 목표로 합니다. 특히, 표준화된 CMSIS-OS v1 API를 사용하여 여러 작업을 효율적으로 관리하는 방법을 보여줍니다.
+이 튜토리얼은 STM32 마이크로컨트롤러에서 CMSIS-OS v1 API를 사용함.
 
-**💡 잠깐! '태스크(Task)'란 무엇인가요?**
+**💡 잠깐! '태스크(Task)'란 ?**
 마이크로컨트롤러가 동시에 여러 가지 일을 처리하는 것처럼 보이게 하는 FreeRTOS의 기본 작업 단위를 '태스크'라고 합니다. 마치 컴퓨터에서 여러 프로그램을 동시에 실행하는 것과 비슷하다고 생각할 수 있습니다. 예를 들어, 하나의 태스크는 LED를 깜빡이고, 다른 태스크는 센서 값을 읽는 일을 담당할 수 있습니다.
 
 ## 2. STM32CubeIDE 설정 가이드: FreeRTOS 준비하기
@@ -17,7 +17,7 @@ STM32CubeIDE에서 FreeRTOS를 사용하기 위한 주요 설정 단계는 다�
 
 -   **Middleware > FREERTOS:**
     -   **Interface:** `CMSIS_V1`을 선택합니다. (대부분의 STM32 장치에서 표준으로 지원하는 인터페이스입니다.)
-    -   **Include Parameters:** `vTaskDelayUntil` 옵션을 활성화합니다. 이 옵션은 태스크가 정확히 정해진 시간 간격으로 반복 실행되도록 할 때 유용합니다. (예: 1초마다 센서 값을 읽는 태스크)
+    -   **Include Parameters:** `vTaskDelayUntil` 옵션을 활성화합니다. 이 옵션은 태스크가 정확히 정해진 시간 간격으로 반복 실행 (예: 1초마다 센서 값을 읽는 태스크)
     - ** Core > Inc > FreeRTOSConfig.h ** 코드 아래와 같이 변경 (GUI 사용 안할 시 , Optional)
         ```code
             #define INCLUDE_vTaskDelayUntil              0
@@ -30,6 +30,24 @@ STM32CubeIDE에서 FreeRTOS를 사용하기 위한 주요 설정 단계는 다�
 ### 3.1. 태스크 생성: 새로운 작업 시작하기
 
 새로운 태스크를 만들고 실행 준비를 시키는 과정입니다.
+
+
+```mermaid
+graph TD
+    A[osThreadId Task2Handler]
+    B[Task Name: "Task2"]
+    C[Task Function: Task2Function()]
+    D[Priority: osPriorityNormal]
+    E[Stack Size: 128 * 4 bytes]
+    F[Handle Storage: Task2Handler]
+
+    A --> B
+    A --> C
+    A --> D
+    A --> E
+    A --> F
+```
+
 
 1.  **태스크 핸들 정의:** `osThreadId Task2Handler;`
     -   `Task2Handler`는 우리가 만든 태스크를 가리키는 '이름표' 또는 '주소'와 같습니다. 이 이름표를 통해 나중에 태스크를 제어할 수 있습니다.
