@@ -67,7 +67,7 @@ static void MX_GPIO_Init(void);
 static void MX_ETH_Init(void);
 static void MX_USART3_UART_Init(void);
 static void MX_USB_OTG_FS_PCD_Init(void);
-void StartDefaultTask(void const * argument);
+
 void Task01_init(void const * argument);
 void Task02_init(void const * argument);
 void Task03_init(void const * argument);
@@ -411,77 +411,48 @@ void print_uart(const char *str)
 /* USER CODE END 4 */
 
 
-/* USER CODE BEGIN Header_Task01_init */
-/**
-* @brief Function implementing the task01 thread.
-* @param argument: Not used
-* @retval None
-*/
-/* USER CODE END Header_Task01_init */
-
-
-void StartDefaultTask(void const* argument){
-  /* USER CODE BEGIN StartDefaultTask */
-  /* Infinite loop */
-  for(;;){
-    print_uart("Default Task\r\n");
-    osDelay(1000);
-  }
-}
-
-
 void Task01_init(void const * argument)
 {
-  /* USER CODE BEGIN Task01_init */
-  /* Infinite loop */
+  
   for(;;)
   {
-    print_uart("Default Task\r\n");
-    osDelay(1000);
+    //uint8_t test =0;
+   // printf("Task01,indx:%d\r\n", test);
+    printf("t1------%d\r\n", indx);
+    osDelay(1000); // 
   }
-  /* USER CODE END Task01_init */
+  
 }
 
 /* USER CODE END Header_Task02_init */
 void Task02_init(void const * argument)
 {
-  /* USER CODE BEGIN Task01_init */
-  /* Infinite loop */
-  for(;;){
-    indx = indx + 1;
-    char buffer[50];
-    snprintf(buffer, sizeof(buffer), "Task02,indx:%d\r\n", indx);
-    print_uart(buffer);
-
-    // SusPend Task 01
-    if (indx  == 5) {
-      osThreadSuspend(task01Handle);
-      print_uart("Task 01 suspended\r\n");
-    }
-    if(indx == 7){
-      print_uart("Task 02 resumed Task 01\r\n");
-      osThreadResume(task01Handle);
-    }
-
-    
-    
+  while(1){
+    printf("Task02,indx:%d\r\n", indx++);
+    // if (indx  == 5) { // 5초 후에 Task 01을 일시 중지
+    //   osThreadSuspend(task01Handle);
+    //   print_uart("Task 01 suspended\r\n");
+    // }
+    // if(indx == 7){ // 7초 후에 Task 01을 다시 시작
+    //   print_uart("Task 02 resumed Task 01\r\n");
+    //   osThreadResume(task01Handle);
+    // }
+   if (indx  == 7){
+      printf("Task 02 will delay for 5 seconds using vTaskDelayUntil\r\n");
+      uint32_t previousTime = osKernelSysTick(); 
+      osDelayUntil(&previousTime, 5000); 
+   } 
     osDelay(1000);
   }
     
 }
-/* USER CODE END Task01_init */
 
-
-/* USER CODE END Header_Task01_init */
 void Task03_init(void const * argument)
 {
-  /* USER CODE BEGIN Task01_init */
-  /* Infinite loop */
   for(;;){
-    print_uart("Task 03 is running\r\n");
+    //print_uart("Task 03\r\n");
     osDelay(1000);
-  }
-    
+  }   
 }
 
 
