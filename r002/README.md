@@ -34,12 +34,12 @@ STM32CubeIDE에서 FreeRTOS를 사용하기 위한 주요 설정 단계는 다�
 
 ```mermaid
 graph TD
-    A[osThreadId Task2Handler]
-    B[Task Name: "Task2"]
-    C[Task Function: Task2Function()]
-    D[Priority: osPriorityNormal]
-    E[Stack Size: 128 * 4 bytes]
-    F[Handle Storage: Task2Handler]
+    A["osThreadId Task2Handler"]
+    B["Task Name: Task2"]
+    C["Task Function: Task2Function()"]
+    D["Priority: osPriorityNormal"]
+    E["Stack Size: 128 * 4 bytes"]
+    F["Handle Storage: Task2Handler"]
 
     A --> B
     A --> C
