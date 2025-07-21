@@ -17,9 +17,23 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+
 #include "main.h"
 #include "string.h"
-#include "cmsis_os.h"
+// #include "cmsis_os.h" 
+// cmsis 라이브러리 대신에 freertos 라이브러리를 사용, 이유 ?  세마포어 카운팅에 대해 좀더 쉽게 설명
+#include "FreeRTOS.h"
+#include "task.h"
+#include "timers.h"
+#include "queue.h"
+#include "semphr.h"
+#include "event_groups.h"
+#include "string.h"
+
+
+
+
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -44,26 +58,37 @@
 /* Private variables ---------------------------------------------------------*/
 UART_HandleTypeDef huart3;
 
-osThreadId taskHandle1;
-osThreadId taskHandle2;
-osThreadId taskHandle3;
+//osThreadId taskHandle1;
+//osThreadId taskHandle2;
+//osThreadId taskHandle3;
 
-osSemaphoreId semephoreHandle;
-
-
+//osSemaphoreId semephoreHandle;
 
 
+
+TaskHandle_t HPThandler;
+TaskHandle_t MPThandler;
+TaskHandle_t LPThandler;
+TaskHandle_t VLPThandler;
 /* USER CODE BEGIN PV */
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART3_UART_Init(void);
-void oneTask(void const * argument);
-void twoTask(void const * argument);
-void threeTask(void const * argument);
+void hptTask(void const * argument);
+void mptTask(void const * argument);
+void lptTask(void const * argument);
+void vlptTask(void const * argument);
+
+SemaphoreHandle_t CountingSem;
+
+int resource[3] = {111,222,333};
+int indx = 0;
+
+uint8_t rx_data = 0;
+
 
 
 /* USER CODE BEGIN PFP */
@@ -115,6 +140,39 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART3_UART_Init();
+  HAL_UART_Receive_IT(&huart3, &rx_data,1); //  마지막 사이즈
+  CountingSem  = xSemaphoreCreateCounting(3,0) ; // 3개의 자원을 가진 세마포어 생성, 초기값은 0
+  if(CountingSem == NULL){ // NULL이면 세마포어 생성 실패
+    const char *str1 = "Semaphore Create Failed\r\n";
+    HAL_UART_Transmit(&huart3, (uint8_t *)str1, strlen(str1), 100); // 25는 문자열 길이, 100 은 타임아웃
+  } else{
+    const char *str2 = "Semaphore Create Success\r\n\r\n";
+    HAL_UART_Transmit(&huart3, (uint8_t *)str2, strlen(str2), 100); // 25는 문자열 길이, 100 은 타임아웃
+  }
+
+
+
+  
+  
+  // BaseType_t xTaskCreate(	
+               // TaskFunction_t pxTaskCode,
+							// const char * const pcName,		/*lint !e971 Unqualified char types are allowed for strings and single characters only. */
+							// const configSTACK_DEPTH_TYPE usStackDepth,
+							// void * const pvParameters,
+							// UBaseType_t uxPriority,
+							// TaskHandle_t * const pxCreatedTask )
+
+  xTaskCreate(hptTask, "HPT", 128, NULL, 3, & HPThandler ); 
+  xTaskCreate(mptTask, "MPT", 128, NULL, 2, & MPThandler ); 
+  xTaskCreate(lptTask, "LPT", 128, NULL, 1, & LPThandler ); 
+  xTaskCreate(vlptTask, "VLPT", 128, NULL, 0, & VLPThandler ); 
+
+  vTaskStartScheduler();
+  
+  xSemaphoreTake(CountingSem, portMAX_DELAY); // 세마포어를 획득, 3개의 자원중 하나를 획득
+  
+
+
   /* USER CODE BEGIN 2 */
   
 

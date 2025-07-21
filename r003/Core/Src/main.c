@@ -397,8 +397,6 @@ void twoTask(void const * argument){
   {
 		char *str1 = "Entered MediumTask\n";
 		HAL_UART_Transmit(&huart3, (uint8_t *) str1, strlen (str1), 100);
-
-
 		char *str2 = "Leaving MediumTask\n\n";
 		HAL_UART_Transmit(&huart3, (uint8_t *) str2, strlen (str2), 100);
 		osDelay(500);
